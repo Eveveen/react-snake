@@ -20,6 +20,7 @@ export default class Index extends Component {
     }
 
     componentDidMount() {
+        // 键盘点击事件
         document.onkeydown = function (event) {
             var e = event || window.event;
             var keyCode = e.keyCode;
@@ -36,8 +37,9 @@ export default class Index extends Component {
                 this.move(direction.down);
                 this.setState({ dir: direction.down })
             }
-        }.bind(this)
-        this.start();
+        }.bind(this);
+        // 初次渲染的时候开启定时
+        this.timer();
     }
 
 
@@ -50,7 +52,7 @@ export default class Index extends Component {
             </div>
             <div className="snakeBody">
                 <table border="1">
-                    {this.init()}
+                    {this.renderBackground()}
                 </table>
                 <div className="buttonGroup">
                     <button onClick={status === 'pause' ? this.handleStart : this.pause}>
@@ -62,7 +64,7 @@ export default class Index extends Component {
         </div>
     }
 
-    init() {
+    renderBackground() {
         let trs = [];
         for (let i = 0; i < size.row; i++) {
             let tds = [];
@@ -99,7 +101,7 @@ export default class Index extends Component {
     }
 
     // 定时自己移动
-    start = () => {
+    timer = () => {
         let interval = setInterval(function () {
             this.move(this.state.dir);
         }.bind(this), 600);
@@ -154,7 +156,7 @@ export default class Index extends Component {
     // 暂停
     pause = () => {
         let i = this.state.interval;
-        window.clearInterval(i);
+        window.clearInterval(i); // 清除定时器
         this.setState({ status: 'pause' })
     }
 
@@ -162,14 +164,13 @@ export default class Index extends Component {
     handleStart = () => {
         const { status } = this.state;
         if (status === 'pause') {
-            this.start();
+            this.timer();  // 重新开启定时器
         }
     }
 
     // 重新开始
     handleRestart = () => {
         let i = this.state.interval;
-        console.log(i)
         window.clearInterval(i);
         this.setState({
             snake: [{ x: 1, y: 1 }],
@@ -179,7 +180,7 @@ export default class Index extends Component {
             status: 'start',
             score: 0
         })
-        this.start()
+        this.timer()
     }
 
     // 显示新的食物
@@ -190,6 +191,7 @@ export default class Index extends Component {
             x = parseInt(Math.random() * size.row);
             y = parseInt(Math.random() * size.col);
         }
+        //每次显示新的食物意味着吃了上一个食物，加1分
         let score = this.state.score + 1;
         this.setState({ food: { x: x, y: y }, score })
     }
